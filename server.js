@@ -24,13 +24,18 @@ var Message = mongoose.model('Message', {
     message: String
 })
 
+/*
 var messages = [
     {name: 'Tim', message: 'Hi'},
     {name: 'Jane', message: 'Hello'}
 ]
+*/
 
 app.get('/messages', (req, res) =>{
-    res.send(messages)
+    //finds all the messages in the database
+    Message.find({}, (err,messages) => {
+        res.send(messages)
+    })
 })
 
 app.post('/messages', (req, res) =>{
@@ -42,7 +47,8 @@ app.post('/messages', (req, res) =>{
         if(err)
             res.sendStatus(500)
         else
-        messages.push(req.body)
+        //no longer need to push to messages array since we are using database
+        //messages.push(req.body)
         io.emit('message', req.body)
         res.sendStatus(200) 
         

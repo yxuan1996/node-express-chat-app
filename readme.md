@@ -17,3 +17,5 @@ Add the following to package.json
 Update the ports
 Use whatever port heroku assigns, or use 8080
 var port = process.env.PORT || 8080;
+
+Further updates include replacing the message array with a mongo database
