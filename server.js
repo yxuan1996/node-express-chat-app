@@ -4,6 +4,10 @@ var app = express()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
 
+// set the port of our application
+// process.env.PORT lets the port be set by Heroku
+var port = process.env.PORT || 8080;
+
 app.use(express.static(__dirname))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
@@ -27,7 +31,7 @@ io.on('connection', (socket) => {
     console.log('a user connected')
 })
 
-//We use port 8080 because of cloud9. Normally, the localhost port is 8080. 
-var server = http.listen(8080, () => {
+//We use port 8080 because of cloud9. Normally, the localhost port is 3000. 
+var server = http.listen(port, () => {
     console.log('server is listening on port', server.address().port)
 })
