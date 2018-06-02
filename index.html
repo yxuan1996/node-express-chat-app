@@ -39,12 +39,12 @@
     }
 
     function getMessages() {
-        $.get('http://localhost:8080/messages', (data) => {
+        $.get('https://obscure-temple-42171.herokuapp.com/messages', (data) => {
             data.forEach(addMessage);
         })
     }
 
     function postMessage(message) {
-        $.post('http://localhost:8080/messages', message)
+        $.post('https://obscure-temple-42171.herokuapp.com/messages', message)
     }
 </script>
