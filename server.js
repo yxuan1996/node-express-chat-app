@@ -9,9 +9,14 @@ var mongoose = require('mongoose')
 // process.env.PORT lets the port be set by Heroku
 var port = process.env.PORT || 8080;
 
+//app.use will serve content to be seen by the user (front-end)
+//by default, this will serve index.html
 app.use(express.static(__dirname))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
+
+//ask mongoose to use the default ES6 promise library instead of the mongoose promise library
+mongoose.Promise = Promise
 
 // set the mongo database URI
 // to get the URI, run the following line on the command line
@@ -38,23 +43,32 @@ app.get('/messages', (req, res) =>{
     })
 })
 
-app.post('/messages', (req, res) =>{
-    //Initialize a database entry
+//Promises allow us to work on asychronous code with a linear/synchronous structure
+app.post('/messages', (req, res) => {
+    //initialize a new database entry
     var message = new Message(req.body)
     
-    //save the message as an entry
-    message.save((err) => {
-        if(err)
-            res.sendStatus(500)
-        else
-        //no longer need to push to messages array since we are using database
-        //messages.push(req.body)
-        io.emit('message', req.body)
-        res.sendStatus(200) 
-        
+    //save the message entry to the database
+    //Promises are use to filter out 'badword'
+    message.save()
+    .then(() => {
+        console.log('saved')
+        return Message.findOne({message: 'badword'})
     })
-    
-    
+    .then( censored => {
+        if(censored) {
+            console.log('censored words found', censored)
+            return Message.remove({_id: censored.id})
+        }
+        //broadcast/push notification of messages into all clients
+        io.emit('message', req.body)
+        res.sendStatus(200)
+    })
+    .catch((err) => {
+        res.sendStatus(500)
+        return console.error(err)
+    })
+
 })
 
 io.on('connection', (socket) => {
